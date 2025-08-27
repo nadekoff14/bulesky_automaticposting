@@ -55,17 +55,24 @@ async def openrouter_reply(query):
 def post_to_bsky(text):
     bsky_client.send_post(text)
 
+# ====== 投稿処理 ======
+async def do_post():
+    theme = random.choice(themes)
+    query = f"テーマは「{theme}」だよ・・・そのテーマについて短くつぶやいてほしいな・・・"
+    text = await openrouter_reply(query)
+    post_to_bsky(text)
+    print("✅ 投稿完了:", text)
+
 # ====== メインループ ======
 async def main():
-    while True:
-        theme = random.choice(themes)
-        query = f"テーマは「{theme}」だよ・・・そのテーマについて短くつぶやいてほしいな・・・"
-        text = await openrouter_reply(query)
-        post_to_bsky(text)
-        print("✅ 投稿完了:", text)
+    # --- 初回投稿（起動直後） ---
+    await do_post()
 
-        # 6時間待つ
-        await asyncio.sleep(21600)
+    # --- 6時間ごとに投稿 ---
+    while True:
+        await asyncio.sleep(21600)  # 6時間待つ
+        await do_post()
 
 if __name__ == "__main__":
     asyncio.run(main())
+
